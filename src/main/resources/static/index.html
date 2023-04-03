@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text Input Example</title>
+    <style>
+        #loader {
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+            display: none;
+            margin: auto;
+            margin-top: 50px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+<form id="text-form">
+    <label for="text-input">Enter Text:</label>
+    <input type="text" id="text-input" name="text-input">
+    <button type="submit">Submit</button>
+</form>
+<div id="loader"></div>
+<div id="result"></div>
+
+<script>
+    const form = document.getElementById("text-form");
+    const loader = document.getElementById("loader");
+    const resultDiv = document.getElementById("result");
+
+    form.addEventListener("submit", event => {
+        event.preventDefault();
+        const textInput = document.getElementById("text-input").value;
+        loader.style.display = "block";
+        resultDiv.innerHTML = "";
+        fetch(`/summary?username=${encodeURIComponent(textInput)}`)
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById("result");
+                resultDiv.innerHTML = `Result: ${data.text}`;
+            })
+            .catch(error => console.error(error))
+            .finally(() => {
+                loader.style.display = "none";
+            });
+    });
+</script>
+</body>
+</html>

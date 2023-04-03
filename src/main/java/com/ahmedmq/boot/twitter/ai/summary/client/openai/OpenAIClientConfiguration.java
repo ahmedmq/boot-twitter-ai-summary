@@ -29,6 +29,7 @@ public class OpenAIClientConfiguration {
         HttpServiceProxyFactory factory =
                 HttpServiceProxyFactory.builder(
                                 WebClientAdapter.forClient(openAIWebClient))
+                        .blockTimeout(java.time.Duration.ofSeconds(10))
                         .build();
         return factory.createClient(OpenAIClient.class);
     }
