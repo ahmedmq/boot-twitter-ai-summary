@@ -17,6 +17,7 @@ public class BootTwitterAiSummaryApplication {
     SecurityFilterChain configure(HttpSecurity http) throws Exception {
         return http
                 .csrf().disable()
+
                 .authorizeRequests(auth -> {
                     auth.anyRequest().permitAll();
                 }).build();

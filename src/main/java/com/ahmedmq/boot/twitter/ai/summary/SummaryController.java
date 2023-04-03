@@ -6,6 +6,7 @@ import com.ahmedmq.boot.twitter.ai.summary.client.openai.model.ChatCompletionRes
 import com.ahmedmq.boot.twitter.ai.summary.client.openai.model.ChatMessage;
 import com.ahmedmq.boot.twitter.ai.summary.client.openai.model.ChatRole;
 import com.ahmedmq.boot.twitter.ai.summary.client.twitter.TwitterClient;
+import com.ahmedmq.boot.twitter.ai.summary.client.twitter.TwitterUserNotFoundException;
 import com.ahmedmq.boot.twitter.ai.summary.client.twitter.model.timeline.Data;
 import com.ahmedmq.boot.twitter.ai.summary.client.twitter.model.timeline.UserTimeline;
 import com.ahmedmq.boot.twitter.ai.summary.client.twitter.model.userlookup.UserLookup;
@@ -28,7 +29,12 @@ public class SummaryController {
     @GetMapping("/summary")
     public SummaryResponse getSummary(@RequestParam("username") String username) {
         UserLookup user = twitterClient.getUserByUsername(username);
+        if (user == null || user.data() == null) {
+            throw new TwitterUserNotFoundException("User with username " + username + " not found");
+        }
+
         UserTimeline userTimeline = twitterClient.getUserTimeline(user.data().id());
+
         String promptText = """
                 You will be given a twitter stream belonging to a specific profile. Answer with a summary of what they've lately been tweeting about and in what languages.
                                                                                     You may go into some detail about what topics they tend to like tweeting about. Please also mention their overall tone, for example: positive,

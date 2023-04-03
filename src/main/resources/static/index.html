@@ -2,54 +2,64 @@
 <html>
 <head>
     <title>Text Input Example</title>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/dist/css/bootstrap.min.css">
     <style>
-        #loader {
-            border: 16px solid #f3f3f3;
-            border-top: 16px solid #3498db;
-            border-radius: 50%;
-            width: 120px;
-            height: 120px;
-            animation: spin 2s linear infinite;
-            display: none;
-            margin: auto;
-            margin-top: 50px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        #result {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-<form id="text-form">
-    <label for="text-input">Enter Text:</label>
-    <input type="text" id="text-input" name="text-input">
-    <button type="submit">Submit</button>
-</form>
-<div id="loader"></div>
-<div id="result"></div>
+<div class="container">
+    <div class="row mt-4 mb-2">
+        <div class="col">
+            <h1>User Tweets Summary using Open AI</h1>
+        </div>
+    </div>
+    <div class="row">
+        <form id="text-form">
+            <div class="row">
+                <div class="col">
+                    <input type="text" class="form-control" placeholder="Enter Text" id="text-input">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" id="submit-button" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="row md-4">
+        <div class="col">
+            <div id="result"></div>
+        </div>
+    </div>
+</div>
 
+<script src="/webjars/bootstrap/dist/js/bootstrap.min.js"></script>
 <script>
     const form = document.getElementById("text-form");
-    const loader = document.getElementById("loader");
     const resultDiv = document.getElementById("result");
+    const button = document.getElementById("submit-button");
 
     form.addEventListener("submit", event => {
+        button.disabled = true;
+        button.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...`;
         event.preventDefault();
         const textInput = document.getElementById("text-input").value;
-        loader.style.display = "block";
         resultDiv.innerHTML = "";
-        fetch(`/summary?username=${encodeURIComponent(textInput)}`)
-            .then(response => response.json())
-            .then(data => {
-                const resultDiv = document.getElementById("result");
-                resultDiv.innerHTML = `Result: ${data.text}`;
-            })
-            .catch(error => console.error(error))
-            .finally(() => {
-                loader.style.display = "none";
-            });
+        fetch(`/summary?username=${encodeURIComponent(textInput)}`).then(async response => {
+          const data = await response.json();
+          if(!response.ok) {
+            const error = (data && data.detail) || response.status;
+            return Promise.reject(error);
+          }
+            resultDiv.innerHTML = `<div class="alert alert-success" role="alert">${data.text}</div>`;
+        }).catch(error => {
+                resultDiv.innerHTML = `<div class="alert alert-danger" role="alert">${error}</div>`;
+        }).finally(() => {
+                button.disabled = false;
+                button.textContent = "Submit";
+        })
     });
 </script>
 </body>
