@@ -12,14 +12,10 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 @Configuration
 public class OpenAIClientConfiguration {
 
-    private static final String OPENAI_API =
-            "https://api.openai.com";
-
-
     @Bean(name="openAiWebClient")
-    WebClient openAIWebClient(@Value("${openai.api.key}") String apiKey) {
+    WebClient openAIWebClient(@Value("${openai.api.base-url}") String openAIUrl, @Value("${openai.api.key}") String apiKey) {
         return WebClient.builder()
-                .baseUrl(OPENAI_API)
+                .baseUrl(openAIUrl)
                 .defaultHeaders(httpHeaders -> httpHeaders.setBearerAuth(apiKey))
                 .build();
     }

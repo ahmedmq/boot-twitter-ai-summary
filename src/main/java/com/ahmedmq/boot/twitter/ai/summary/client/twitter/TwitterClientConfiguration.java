@@ -1,6 +1,7 @@
 package com.ahmedmq.boot.twitter.ai.summary.client.twitter;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
@@ -12,12 +13,9 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 @Configuration
 public class TwitterClientConfiguration {
 
-    private static final String TWITTER_V2_API =
-            "https://api.twitter.com/2";
-
     @Bean(name = "twitterWebClient")
     WebClient webClient(OAuth2AuthorizedClientManager
-                                authorizedClientManager) {
+                                authorizedClientManager, @Value("${twitter.api.base-url}") String twitterApi) {
 
         ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2 =
                 new ServletOAuth2AuthorizedClientExchangeFilterFunction(
@@ -25,7 +23,7 @@ public class TwitterClientConfiguration {
         oauth2.setDefaultClientRegistrationId("twitter");
 
         return WebClient.builder()
-                .baseUrl(TWITTER_V2_API)
+                .baseUrl(twitterApi)
                 .apply(oauth2.oauth2Configuration())
                 .build();
     }
